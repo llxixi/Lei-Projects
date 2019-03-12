@@ -22,7 +22,7 @@ func Download(urlString string) (string, error) {
 	}
 	defer res.Body.Close()
 	if res.StatusCode != 200 {
-		log.Fatalf("status code error: %d %s", res.StatusCode, res.Status)
+		log.Println("status code error: %d %s", res.StatusCode, res.Status)
 	}
 	//load the html document
 	doc, err := goquery.NewDocumentFromReader(res.Body)
