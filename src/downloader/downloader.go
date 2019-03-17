@@ -1,8 +1,11 @@
 package downloader
 
 import (
+	"bytes"
 	"fmt"
 	"github.com/PuerkitoBio/goquery"
+	"golang.org/x/text/encoding/simplifiedchinese"
+	"golang.org/x/text/transform"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -45,11 +48,16 @@ func Save(content string, directory string, name string) error {
 }
 
 func ReadFromPath(path string) (string, error) {
+
 	btcontents, err := ioutil.ReadFile(path)
-	var builder = strings.Builder{}
-	builder.Write(btcontents)
-	contents := builder.String()
-	return contents, err
+	//var builder = strings.Builder{}
+	//builder.Write(btcontents)
+	//contents := builder.String()
+	data, err := ioutil.ReadAll(transform.NewReader(bytes.NewReader(btcontents), simplifiedchinese.GBK.NewDecoder()))
+	var builder2 = strings.Builder{}
+	builder2.Write(data)
+	contents2 := builder2.String()
+	return contents2, err
 }
 
 // IsExist checks whether a file or directory exists.

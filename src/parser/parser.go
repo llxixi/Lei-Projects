@@ -73,37 +73,75 @@ func GetPageItems(content string) map[string]string {
 }
 
 func GetBookDetail(content string) interface{} {
+
 	r := bytes.NewReader([]byte(content))
 	doc, err := goquery.NewDocumentFromReader(r)
 	if err != nil {
 		log.Fatal(err)
 	}
-	name := doc.Find(".sku-name").Text()
-	bookDetails := doc.Find("#parameter2 li")
+	name := doc.Find(".p-name").Text()
+	bookDetails := doc.Find(".Ptable tr")
 	publisher := ""
 	isbn := ""
 	publishcount := ""
 	jdsku := ""
-	brand := ""
+	//brand := ""
 	cover := ""
+	congshu := ""
 	kaiben := ""
 	publishDatetime := ""
 	pagecount := ""
-	workcount := ""
+	paperMode := ""
 
 	bookDetails.Each(func(i int, s *goquery.Selection) {
-		text := s.Text()
+		text := s.Find("td:nth-child(1)").Text()
+		text2 := s.Find("td:nth-child(2)").Text()
+
 		if strings.Contains(text, "出版社") {
-			publisher = strings.Split(text, ":")[1]
+			publisher = text2
 		}
 		if strings.Contains(text, "ISBN") {
-			isbn = strings.Split(text, ":")[1]
+			isbn = text2
+		}
+		if strings.Contains(text, "版次") {
+			publishcount = text2
+		}
+		if strings.Contains(text, "商品编码") {
+			jdsku = text2
+		}
+		if strings.Contains(text, "包装") {
+			cover = text2
+		}
+
+		if strings.Contains(text, "丛书名") {
+			congshu = text2
+		}
+		if strings.Contains(text, "开本") {
+			kaiben = text2
+		}
+		if strings.Contains(text, "出版时间") {
+			publishDatetime = text2
+		}
+		if strings.Contains(text, "用纸") {
+			paperMode = text2
+		}
+		if strings.Contains(text, "页数") {
+			pagecount = text2
 		}
 	})
 	ds := bson.D{
 		{"title", name},
 		{"publisher", publisher},
 		{"isbn", isbn},
+		{"publishcount", publishcount},
+		{"jdsku", jdsku},
+		{"cover", cover},
+		{"congshu", congshu},
+		{"publisher", publisher},
+		{"kaiben", kaiben},
+		{"publishDatetime", publishDatetime},
+		{"paperMode", paperMode},
+		{"pagecount", pagecount},
 	}
 	return ds
 }

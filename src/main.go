@@ -4,6 +4,7 @@ import (
 	"JDSpider/src/downloader"
 	"JDSpider/src/parser"
 	"bufio"
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -84,10 +85,39 @@ func main() {
 			}
 		case "5":
 			fmt.Println("5")
-			rand.Seed(time.Now().UnixNano())
-			num := rand.Int31n(10)
-			fmt.Println(num)
-			time.Sleep(time.Duration(num) * time.Second)
+			rd, err := ioutil.ReadDir("E:\\JD\\童书")
+			if err != nil {
+				log.Fatal(err)
+			}
+			//parsing each list page to get all the books url and download book detail page into detail folder in category folder
+			for _, fi := range rd {
+				if fi.IsDir() {
+					sBuilder := strings.Builder{}
+					sBuilder.WriteString("E:\\JD\\童书\\")
+					sBuilder.WriteString(fi.Name())
+					sBuilder.WriteString("\\details")
+					rd2, err := ioutil.ReadDir(sBuilder.String())
+					if err != nil {
+						log.Fatal(err)
+					}
+					for _, ab := range rd2 {
+						if ab.IsDir() == false {
+							contents, _ := downloader.ReadFromPath(sBuilder.String() + "\\" + ab.Name())
+							ds := parser.GetBookDetail(contents)
+							jsonResp, merr := json.Marshal(ds)
+							if merr != nil {
+								fmt.Println(err)
+							}
+
+							// We can get the data just fine as JSON
+							fmt.Printf("\nJSON DATA\n")
+							fmt.Println(string(jsonResp))
+							println(ds)
+						}
+					}
+				}
+			}
+
 		default:
 			fmt.Println("unknown command")
 		}
